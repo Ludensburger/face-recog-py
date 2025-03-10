@@ -52,11 +52,7 @@ start_time = time.time()
 frame_count = 0
 
 # Process every other frame to save time
-process_this_frame = True
-
-face_locations = []
-face_names = []
-face_landmarks_list = []
+process_this_frame = 0
 
 # Main loop
 while True:
@@ -65,11 +61,13 @@ while True:
         print("Failed to grab frame.")
         break
 
+    frame = cv2.flip(frame, 1)
+
     # Resize for performance
-    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.2, fy=0.2)  # Reduce size further
     rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
 
-    if process_this_frame:
+    if process_this_frame % 4 == 0:
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
         face_landmarks_list = face_recognition.face_landmarks(rgb_small_frame)
@@ -83,29 +81,28 @@ while True:
                 name = known_face_names[first_match_index]
             face_names.append(name)
 
-    process_this_frame = not process_this_frame
+    process_this_frame += 1
 
     # Draw rectangles and labels
     for (top, right, bottom, left), name in zip(face_locations, face_names):
         # Scale back up to full size
-        top *= 4
-        right *= 4
-        bottom *= 4
-        left *= 4
+        top *= 5
+        right *= 5
+        bottom *= 5
+        left *= 5
 
         cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
         cv2.putText(frame, name, (left, top - 10), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
 
-    # Draw facial landmarks
-    for face_landmarks in face_landmarks_list:
-        for facial_feature in face_landmarks.keys():
-            for point in face_landmarks[facial_feature]:
-                point = (point[0] * 4, point[1] * 4)  # Scale back up to full size
-                cv2.circle(frame, point, 1, (0, 0, 255), -1)
+    # # Draw facial landmarks
+    # for face_landmarks in face_landmarks_list:
+    #     for facial_feature in face_landmarks.keys():
+    #         for point in face_landmarks[facial_feature]:
+    #             point = (point[0] * 5, point[1] * 5)  # Scale back up to full size
+    #             cv2.circle(frame, point, 1, (0, 0, 255), -1)
 
     # Show the frame
     cv2.imshow('Face Recognition', frame)
-
 
     # OPTIONAL: Display
     # Print FPS every second
