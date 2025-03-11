@@ -105,15 +105,26 @@ while True:
                 cv2.putText(frame, text, label_position, cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1)
                 
                 # Adjust line connection point to the end of the text
+                # Last letter
                 line_end_position = (label_position[0] + text_size[0], label_position[1])  
                 cv2.line(frame, (points[0][0] * 5, points[0][1] * 5), line_end_position, (255, 255, 255), 1)
 
             elif facial_feature == 'right_eye':
+                text = 'Right Eye'
+                text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_DUPLEX, 0.5, 1)[0]  # Get text width and height
+                
                 # Choose a specific point for the right eye (e.g., the first point)
                 specific_point = points[3]  # Change the index to choose a different point
+
+                # Adjust label position relative to the specific point
                 label_position = (specific_point[0] * 5 + 75, specific_point[1] * 5 - 40)
-                cv2.putText(frame, 'Right Eye', label_position, cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1)
-                cv2.line(frame, (specific_point[0] * 5, specific_point[1] * 5), label_position, (255, 255, 255), 1)
+
+                cv2.putText(frame, text, label_position, cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1)
+
+                # Adjust line connection point to the end of the text
+                # First letter
+                line_end_position = (label_position[0], label_position[1])  
+                cv2.line(frame, (specific_point[0] * 5, specific_point[1] * 5), line_end_position, (255, 255, 255), 1)
 
                 
             elif facial_feature == 'nose_bridge': 
