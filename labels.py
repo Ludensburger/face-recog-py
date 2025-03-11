@@ -3,6 +3,18 @@ import face_recognition
 import time
 import os
 
+# Facial Landmarks Detected:
+    # chin: 17 points, left ear to right ear
+    # left_eyebrow: 5 points, left to right
+    # right_eyebrow: 5 points, keft to right
+    # nose_bridge: 4 points, top to bottom
+    # nose_tip: 5 points, left to right
+    # left_eye: 6 points, starting from left corner and proceeding clockwise
+    # right_eye: 6 points, starting from left corner and proceeding clockwise
+    # top_lip: 12 points, starting from the left corner and proceeding clockwise above and around the mouth
+    # bottom_lip: 12 points, starting from the right corner and proceeding counterclockwise below and around the mouth
+
+
 # Load all known faces
 known_face_encodings = []
 known_face_names = []
@@ -43,9 +55,9 @@ if not cap:
     print("No working camera found.")
     exit()
 
-# Lower resolution for performance
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+# Mid resolution for performance
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 # FPS tracking
 start_time = time.time()
@@ -53,6 +65,13 @@ frame_count = 0
 
 # Process every fourth frame to save time
 process_this_frame = 0
+
+# Flag to ensure landmarks are printed only once
+landmarks_printed = False
+
+# Facial features to skip
+# Guide: chin, left_eyebrow, right_eyebrow, nose_tip, top_lip, bottom_lip
+features_to_skip = []
 
 # Main loop
 while True:
@@ -76,6 +95,13 @@ while True:
             face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
             face_landmarks_list = face_recognition.face_landmarks(rgb_small_frame)
 
+            if face_landmarks_list and not landmarks_printed:
+                print("\nFacial Landmarks Detected:")
+                for face_landmarks in face_landmarks_list:
+                    for facial_feature, points in face_landmarks.items():
+                        print(f"{facial_feature}: {len(points)} points")
+                landmarks_printed = True
+
         face_names = []
         for face_encoding in face_encodings:
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
@@ -90,6 +116,9 @@ while True:
     # Draw facial landmarks with index numbers
     for face_landmarks in face_landmarks_list:
         for facial_feature, points in face_landmarks.items():
+            if facial_feature in features_to_skip:
+                continue
+
             for index, point in enumerate(points):
                 scaled_point = (point[0] * 5, point[1] * 5)  # Scale back up to full size
                 
@@ -105,15 +134,6 @@ while True:
 
     # Show the frame
     cv2.imshow('Face Recognition', frame)
-
-    # OPTIONAL: Display
-    # Print FPS every second
-    frame_count += 1
-    if time.time() - start_time >= 1:
-        print(f"FPS: {frame_count}")
-        frame_count = 0
-        start_time = time.time()
-    # OPTIONAL: Display
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
