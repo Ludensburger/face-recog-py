@@ -2,7 +2,8 @@ import cv2
 import os
 
 name = input("Enter your name: ")
-save_path = f"photos/{name}"
+photos_path = os.path.join(os.path.dirname(__file__), "photos", "training-data")  # Updated path
+save_path = f"{photos_path}/{name}"
 
 os.makedirs(save_path, exist_ok=True)
 
