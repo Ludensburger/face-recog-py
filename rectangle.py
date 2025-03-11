@@ -8,9 +8,9 @@ known_face_encodings = []
 known_face_names = []
 
 # Path to photos directory of known faces
-photos_path = "photos"
+photos_path = os.path.join(os.path.dirname(__file__), "photos", "training-data")  # Updated path
 
-# Load and encode all images from /photos a.k.a. known faces
+# Load and encode all images from /training-data a.k.a. known faces
 for person in os.listdir(photos_path):
     person_dir = os.path.join(photos_path, person)
     if os.path.isdir(person_dir):
